@@ -1,0 +1,10 @@
+.idea
+.svn
+out
+gen
+node_modules/
+*.iml
+.DS_Store
+._*
+.project
+

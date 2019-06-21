@@ -13,3 +13,16 @@ web性能的提升做了一个总结
 + 设计模式优化
 + 代码优化
 + 并发优化
+
+### Nginx部分
+主要配置了缓存设置和常用优化配置，如设置缓存生效日期，多核并发处理，防盗链设置等等
+
+缓存的工作流程如下图:
+
+![浏览器处理缓存策略图](https://user-gold-cdn.xitu.io/2018/5/28/163a4d01fdd197b6?imageView2/0/w/1280/h/960/ignore-error/1)
+
+
+### 附录部分
+这里参考了web请求过程的示意图:
+
+![web请求过程示意图](https://user-gold-cdn.xitu.io/2018/5/28/163a4d01fdc524f3?imageView2/0/w/1280/h/960/ignore-error/1)

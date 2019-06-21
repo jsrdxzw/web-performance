@@ -3,8 +3,8 @@
 out
 gen
 node_modules/
-*.iml
 .DS_Store
 ._*
 .project
-
+package-lock.json
+demo/build/

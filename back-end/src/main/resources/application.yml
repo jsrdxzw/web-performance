@@ -1,1 +1,32 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,beans"
 
+spring:
+  datasource:
+    hikari:
+      #连接池中允许的最大连接数。缺省值：10；
+      #推荐的公式：((core_count * 2) + effective_spindle_count)
+      #例如一个4核，1块硬盘的服务器，连接数 = （4 * 2） + 1 = 9
+      maximum-pool-size: 10
+      #一个连接的生命时长（毫秒），超时而且没被使用则被释放（retired），缺省:30分钟，
+      #强烈建议设置比数据库超时时长少30秒，参考MySQL wait_timeout参数（show variables like '%timeout%，一般为8小时';）
+      max-lifetime: 1800000
+      jdbc-url: jdbc:mysql://localhost:3306/demo
+      #和mysql配合使用的优化
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+        useLocalSessionState: true
+        rewriteBatchedStatements: true
+        cacheResultSetMetadata: true
+        cacheServerConfiguration: true
+        elideSetAutoCommits: true
+        maintainTimeStats: false
+    username: xzw
+    password: xzw
+    driver-class-name: com.mysql.cj.jdbc.Driver

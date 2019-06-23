@@ -1,10 +1,8 @@
 package com.recruit.springdemo.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
+import java.sql.Date;
 import java.util.List;
 
 /**
@@ -13,11 +11,14 @@ import java.util.List;
  * @Description:
  */
 @Data
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class CoffeeOrder {
+    private long id;
     private String customer;
     private List<Coffee> items;
     private OrderState state;
+    private Date createTime;
+    private Date updateTime;
 }

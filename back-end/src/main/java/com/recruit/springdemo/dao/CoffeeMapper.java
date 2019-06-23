@@ -4,6 +4,9 @@ import com.recruit.springdemo.domain.Coffee;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+import java.util.Optional;
+
 /**
  * @Author: xuzhiwei
  * @Date: 2019-06-23
@@ -11,5 +14,11 @@ import org.apache.ibatis.annotations.Param;
  */
 @Mapper
 public interface CoffeeMapper {
-    Coffee findCoffeeById(@Param("id") int id);
+
+    Optional<Coffee> findCoffeeById(@Param("id") long id);
+
+    Optional<Coffee> findCoffeeByName(@Param("name") String name);
+
+    List<Coffee> findCoffeeList();
+
 }

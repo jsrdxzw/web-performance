@@ -4,6 +4,16 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.recruit.springdemo.dao.CoffeeMapper">
     <select id="findCoffeeById" resultType="Coffee">
-        select * from t_coffee where id = #{id}
+        select *
+        from t_coffee
+        where id = #{id}
+    </select>
+    <select id="findCoffeeByName" resultType="Coffee">
+        select *
+        from t_coffee
+        where name = #{name}
+    </select>
+    <select id="findCoffeeList" resultType="Coffee">
+        select * from t_coffee
     </select>
 </mapper>

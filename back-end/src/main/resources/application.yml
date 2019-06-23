@@ -14,7 +14,6 @@ spring:
       #一个连接的生命时长（毫秒），超时而且没被使用则被释放（retired），缺省:30分钟，
       #强烈建议设置比数据库超时时长少30秒，参考MySQL wait_timeout参数（show variables like '%timeout%，一般为8小时';）
       max-lifetime: 1800000
-      jdbc-url: jdbc:mysql://localhost:3306/demo
       #和mysql配合使用的优化
       data-source-properties:
         cachePrepStmts: true
@@ -30,3 +29,12 @@ spring:
     username: xzw
     password: xzw
     driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/demo
+    type: com.zaxxer.hikari.HikariDataSource
+
+#mybatis:
+mybatis:
+  type-handlers-package: "com.recruit.springdemo.handler"
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: "com.recruit.springdemo.domain"

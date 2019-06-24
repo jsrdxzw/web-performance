@@ -31,7 +31,6 @@ gen
 target
 node_modules/
 ._*
-.project
 package-lock.json
 demo/build/
 .mvn

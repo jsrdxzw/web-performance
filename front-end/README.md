@@ -1,7 +1,10 @@
 ## web 前端性能的提升方案
 
 web前端性能的优化，是web整个应用优化的重要组成部分，
-其中主要使用webpack打包工具对工程进行自动化构建优化
+其中主要使用webpack打包工具对工程进行自动化构建优化,
+使用方法：
++ ```npm install --save```
++ ```npm run build```
 
 ### 静态资源优化(Html+Css+Js)
 + 压缩js，css，html等静态资源（详见webpack的相关配置）

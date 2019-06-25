@@ -77,3 +77,15 @@ class Example{
     }
 }
 ```
+
+#### 字符串操作
+字符串拼接操作请务必使用`StringBuilder`，有并发的情况使用`StringBuffer`，
+此外在创建字符串的时候禁止使用new创建
+```java
+public class Example{
+    public static void main(String[] args){
+      String str = new String("qwe"); // not good
+      String str = "qwe"; // good
+    }
+}
+```

@@ -52,7 +52,17 @@ class Example{
 其中ArrayList基于数组实现的，支持动态扩容和快速随机访问，
 而LinkedList则基于双向链表实现。
 
-*我们在插入或者删除头元素的时候使用LinkedList，否则其他情况尽可能使用ArrayList*，
+我们知道基于链表的数据结构，在查找的时候都得先遍历一遍，
+但是插入数据的时候一定比ArrayList快吗？
+网上有很多资料说得也不准确，在插入数据的时候得具体情况分析：
++ 在尾部插入数据，ArrayList不需要做数据移动，LinkedList需要新建节点对象，总体ArrayList快于LinkedList
++ 在头部插入数据，LinkedList快于ArrayList
++ 在中间插入数据，LinkedList需要遍历，算法复杂度为O(n)，ArrayList也需要移动数组数据，但是ArrayList只需要直接覆盖值操作，LinkedList
+  需要创建对象，改变指针等操作，所以在时间上ArrayList快于LinkedList
+  
+删除操作也是同理
+
+**我们在插入或者删除头元素的时候使用LinkedList，否则其他情况尽可能使用ArrayList**，
 在遍历ArrayList的时候，使用for循环比forEach循环更快（数组下标访问是最快的）
 ```java
 class Example{

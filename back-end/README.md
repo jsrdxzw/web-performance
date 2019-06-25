@@ -46,3 +46,24 @@ class Example{
 }
 ```
 另外，尽量使用String的indexOf方法替代正则表达式
+
+#### 正确使用List数据结构
+常用的List数据结构分为ArrayList和LinkedList，
+其中ArrayList基于数组实现的，支持动态扩容和快速随机访问，
+而LinkedList则基于双向链表实现。
+
+*我们在插入或者删除头元素的时候使用LinkedList，否则其他情况尽可能使用ArrayList*，
+在遍历ArrayList的时候，使用for循环比forEach循环更快（数组下标访问是最快的）
+```java
+class Example{
+    public static void main(String[] args){
+        List<String> array = new ArrayList<>();
+        array.add("1");
+        array.add("2");
+        array.add("3");
+        for(int i = 0; i < array.size(); i++) {
+          System.out.println(i);
+        }
+    }
+}
+```

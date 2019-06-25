@@ -63,7 +63,7 @@ class Example{
 删除操作也是同理
 
 **我们在插入或者删除头元素的时候使用LinkedList，否则其他情况尽可能使用ArrayList**，
-在遍历ArrayList的时候，使用for循环比forEach循环更快（数组下标访问是最快的）
+
 ```java
 class Example{
     public static void main(String[] args){
@@ -89,3 +89,64 @@ public class Example{
     }
 }
 ```
+
+#### 借助Stream操作优化遍历，提升性能
+首先看一个按照性别过滤身高小于160的学生的例子，传统的做法如下所示：
+```java
+class Example{
+    public static void main(String[] args){
+       Map<String, List<Student>> stuMap = new HashMap<>();
+              List<Student> studentList = new ArrayList<>();
+              studentList.add(new Student(150, "man"));
+              studentList.add(new Student(160, "woman"));
+              studentList.add(new Student(170, "man"));
+              studentList.add(new Student(165, "woman"));
+              for (Student student : studentList) {
+                  if (student.getHeight() > 160) {
+                      if (stuMap.get(student.getSex()) == null) {
+                          List<Student> list = new ArrayList<>();
+                          list.add(student);
+                          stuMap.put(student.getSex(), list);
+                      } else {
+                          stuMap.get(student.getSex()).add(student);
+                      }
+                  }
+              }
+              System.out.println(stuMap); // {man=[Student{height=170, sex='man'}], woman=[Student{height=165, sex='woman'}]}
+    }
+}
+```
+如果我们使用Stream的方式处理数据，代码不但变得简单，在处理大量数据的时候，也会提高性能：
+```java
+public class Example {
+    public static void main(String[] args) {
+        Map<String, List<Student>> stuMap;
+        List<Student> studentList = new ArrayList<>();
+        studentList.add(new Student(150, "man"));
+        studentList.add(new Student(160, "woman"));
+        studentList.add(new Student(170, "man"));
+        studentList.add(new Student(165, "woman"));
+        // 使用串行方式
+        stuMap = studentList.stream().filter(s -> s.getHeight() > 160).collect(Collectors.groupingBy(Student::getSex));
+        System.out.println(stuMap); // {man=[Student{height=170, sex='man'}], woman=[Student{height=165, sex='woman'}]}
+        // 使用并行方式
+        stuMap = studentList.parallelStream().filter(s -> s.getHeight() > 160).collect(Collectors.groupingBy(Student::getSex));
+        System.out.println(stuMap); // {man=[Student{height=170, sex='man'}], woman=[Student{height=165, sex='woman'}]}
+    }
+}
+```
+再看一个例子
+```java
+class Example{
+    public static void main(String[] args){
+      List<String> names = Arrays.asList("张三", "李四", "王老五", "李三", "刘老四", "王小二", "张四", "张五六七");
+      // 并行处理
+      int res = names.stream().parallel().filter(name -> name.startsWith("张")).mapToInt(String::length).max().orElse(0);
+      System.out.println(res); // 4
+    }
+}
+```
+总结一下Stream的使用：
++ 在循环迭代次数较少的情况下，常规的迭代方式性能反而更好
++ 在单核 CPU 服务器配置环境中，也是常规迭代方式更有优势
++ 数据量大，如果服务器是多核 CPU 的情况下，Stream 的并行迭代**优势明显**，注意并行计算后终止操作为Collect

@@ -206,3 +206,25 @@ Tomcat中为每一个http请求都会创建一个线程，我们可以通过设�
                redirectPort="8443" />
 ```
 *需要注意的是，在tomcat status中，max-threads的值显示的是-1，这个是表示配置已经生效的意思*
+
+#### Tomcat运行模式
+tomcat的运行模式有3种：
+1. bio
+   默认的模式,性能非常低下,没有经过任何优化处理和支持.
+2. nio
+   nio(new I/O)，是Java SE 1.4及后续版本提供的一种新的I/O操作方式(即java.nio包及其子包)。
+   Java nio是一个基于缓冲区、并能提供非阻塞I/O操作的Java API，因此nio也被看成是non-blocking I/O的缩写。它拥有比传统I/O操作(bio)更好的并发运行性能。
+3. apr
+   安装起来最困难,但是从操作系统级别来解决异步的IO问题,大幅度的提高性能.
+
+推荐使用nio，不过，在tomcat8中有最新的nio2，速度更快，建议使用nio2。
+如果对应用的性能有极致化的要求，推荐使用apr。
+
+**开启nio2运行模式:**
+
+仍然是在`server.xml`文件中进行修改
+```html
+<Connector executor="tomcatThreadPool"  port="8080" protocol="org.apache.coyote.http11.Http11Nio2Protocol"
+               connectionTimeout="20000"
+               redirectPort="8443" />
+```

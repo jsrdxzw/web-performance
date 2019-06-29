@@ -151,3 +151,24 @@ class Example{
 + 在单核 CPU 服务器配置环境中，也是常规迭代方式更有优势
 + 数据量大，如果服务器是多核 CPU 的情况下，Stream 的并行迭代**优势明显**，注意并行计算后终止操作为Collect
 + 并行操作时，需要考虑线程安全的问题
+
+### Tomcat 层面的优化
+#### 首先需要配置Tomcat
+在tomcat-users.xml文件中，添加以下内容，增加tomcat的用户访问控制
+```html
+<role rolename="manager"/>
+<role rolename="manager-gui"/>
+<role rolename="admin"/>
+<role rolename="admin-gui"/>
+<user username="tomcat" password="tomcat" roles="admin-gui,admin,manager-gui,manager"/>
+```
+如果是7以上的版本，并且希望远程主机登录的话，还需要修改`webapps/manager/META-INF/context.xml`
+```html
+<Context antiResourceLocking="false" privileged="true" >
+ <!-- 这段需要注释掉-->
+ <!-- <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+         allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" /> -->
+  <Manager sessionAttributeValueClassNameFilter="java\.lang\.(?:Boolean|Integer|Long|Number|String)|org\.apache\.catalina\.filters\.CsrfPreventionFilter\$LruCache(?:\$1)?|java\.util\.(?:Linked)?HashMap"/>
+</Context>
+```
+通过以上的配置，我们就可以通过tomcat的server status来查看JVM的运行状态，从而进行调优

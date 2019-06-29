@@ -172,3 +172,37 @@ class Example{
 </Context>
 ```
 通过以上的配置，我们就可以通过tomcat的server status来查看JVM的运行状态，从而进行调优
+
+#### 禁用AJP
+一般的大型项目采用的都是 Nginx+Tomcat，我们就不需要AJP了(默认8009端口),节省资源，
+在`server.xml`文件中直接禁用掉即可。
+```html
+<!-- Define an AJP 1.3 Connector on port 8009 -->
+<!--    <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />-->
+```
+然后重新启动Tomcat服务器
+
+#### 优化Tomcat线程池
+Tomcat中为每一个http请求都会创建一个线程，我们可以通过设置线程池来提高性能，
+修改`server.xml`文件，打开线程池的注释，并在Connector中指定线程池
+```html
+    <!--The connectors can use a shared executor, you can define one or more named thread pools-->
+
+    <Executor name="tomcatThreadPool" namePrefix="catalina-exec-"
+        maxThreads="500" minSpareThreads="50" prestartminSpareThreads="true" maxQueueSize="100"/>
+        
+    <!--
+    参数说明：
+    maxThreads：最大并发数，默认设置 200，一般建议在 500 ~ 1000，根据硬件设施和业务来判断
+    minSpareThreads：Tomcat 初始化时创建的线程数
+    prestartminSpareThreads： 在 Tomcat 初始化的时候就初始化 minSpareThreads 的参数值，如果不等于 true，minSpareThreads 的值就没啥效果了
+    maxQueueSize，最大的等待队列数，超过则拒绝请求
+    -->
+    
+    <!--    这里需要指定executor-->
+    <Connector executor="tomcatThreadPool"
+               port="8080" protocol="HTTP/1.1"
+               connectionTimeout="20000"
+               redirectPort="8443" />
+```
+*需要注意的是，在tomcat status中，max-threads的值显示的是-1，这个是表示配置已经生效的意思*

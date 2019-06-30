@@ -7,9 +7,19 @@ package com.recruit.springdemo.handler;
  */
 public class Test {
     public static void main(String[] args) {
-        int a = 2;
-        int b = 5;
-        int c = b - a;
-        System.out.println(c);
+        new Test().method1();
+        new Test().method2();
+    }
+
+    public void method1(){
+        int i = 1;
+        int a = i++;
+        System.out.println(a);
+    }
+
+    public void method2(){
+        int i = 1;
+        int a = ++i;
+        System.out.println(a);
     }
 }

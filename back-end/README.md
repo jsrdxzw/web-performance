@@ -22,6 +22,7 @@
 ### 代码层面的优化
 
 #### 使用javap反编译代码，查看java字节码分析
+在分析java性能时候，我们需要使用javap的方式读字节码来分析问题，
 比如在intelliJ IDEA中，我们可以配置javap的运行方式，动态查看java类的编译结果，具体配置如下：
 
 ![javap](assets/javap.png)

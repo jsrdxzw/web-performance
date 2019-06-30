@@ -210,6 +210,7 @@ jmeter可以模拟用户并发请求，主要测试步骤如下图所示：
 #### 禁用AJP
 一般的大型项目采用的都是 Nginx+Tomcat，我们就不需要AJP了(默认8009端口),节省资源，
 在`server.xml`文件中直接禁用掉即可。
+
 ```html
 <!-- Define an AJP 1.3 Connector on port 8009 -->
 <!--    <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />-->
@@ -219,6 +220,7 @@ jmeter可以模拟用户并发请求，主要测试步骤如下图所示：
 #### 优化Tomcat线程池
 Tomcat中为每一个http请求都会创建一个线程，我们可以通过设置线程池来提高性能，
 修改`server.xml`文件，打开线程池的注释，并在Connector中指定线程池
+
 ```html
     <!--The connectors can use a shared executor, you can define one or more named thread pools-->
 
@@ -230,7 +232,8 @@ Tomcat中为每一个http请求都会创建一个线程，我们可以通过设�
     maxThreads：最大并发数，默认设置 200，一般建议在 500 ~ 1000，根据硬件设施和业务来判断
     minSpareThreads：Tomcat 初始化时创建的线程数
     prestartminSpareThreads： 在 Tomcat 初始化的时候就初始化 minSpareThreads 的参数值，如果不等于 true，minSpareThreads 的值就没啥效果了
-    maxQueueSize，最大的等待队列数，超过则拒绝请求
+    maxQueueSize，最大的等待队列数，超过则拒绝请求，保证服务器的安全，防止雪崩效应，
+    并且可以加快平均响应时间，典型12306
     -->
     
     <!--    这里需要指定executor-->
@@ -263,3 +266,20 @@ tomcat的运行模式有3种：
                redirectPort="8443" />
 ```
 
+#### 调整JVM参数
+
+GC的次数减少，意味着性能的提高，我们可以通过`easyGC`来查看GC的次数，GC时间等关键参数。
+
+**设置G1垃圾回收器**
+
+我们可以设置G1垃圾回收器来查看是否能够提高Java程序的性能，在`catalina.sh`中添加jvm运行参数：
+```bash
+#GC最大停顿时间100毫秒，初始堆内存128m，最大堆内存1024m,具体按照服务器的实际情况设置
+JAVA_OPTS="-XX:+UseG1GC -XX:MaxGCPauseMillis=100 -Xms128m -Xmx1024m -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+PrintHeapAtGC -Xloggc:../logs/gc.log"
+```
+其中堆内存的分配：
+1. 具体根据每个应用的情况来，比如日均请求量、fullgc之后内存的大小均值等
+2. 建议最大不超过操作系统内存的3/4
+
+然后通过jmeter进行性能测试，并且通过`easyGC`来查看程序的GC情况，
+一般需要经过多次参数调优，才能得到理想的结果。

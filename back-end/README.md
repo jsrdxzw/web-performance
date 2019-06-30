@@ -21,6 +21,14 @@
 
 ### 代码层面的优化
 
+#### 使用javap反编译代码，查看java字节码分析
+比如在intelliJ IDEA中，我们可以配置javap的运行方式，动态查看java类的编译结果，具体配置如下：
+
+![javap](assets/javap.png)
+
+然后在java文件中右键选择external tools的javap即可。
+
+
 #### 谨慎使用正则表达式
 正则表达式默认是贪婪匹配，比如`\ab${1,3}c\`就是尽可能的匹配多的b，
 这样会造成回溯的问题，占用CPU的计算资源。

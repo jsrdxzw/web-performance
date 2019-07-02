@@ -162,6 +162,74 @@ class Example{
 + 数据量大，如果服务器是多核 CPU 的情况下，Stream 的并行迭代**优势明显**，注意并行计算后终止操作为Collect
 + 并行操作时，需要考虑线程安全的问题
 
+
+#### HashMap的使用
+HashMap在使用上强烈建议设置初始值size，计算公式为`dataSize/LOAD_FACTOR`
+其中dataSize为要存储的值大小，load_factor为hashMap的装载因子，默认为0.75
+
+#### 务必使用nio，不要使用传统的io操作
+IO数据流操作，比如网络数据传输，文件读写等等耗时操作，很容易成为系统
+性能的瓶颈，nio下的文件流操作大大快于传统的io操作。
+
+nio文件的创建，内容读写操作例子：
+```java
+public class SimpleFile {
+    public static void main(String[] args) throws IOException {
+        Path path = Paths.get("mystuff.txt");
+        if (!Files.exists(path)){
+            Files.createFile(path);
+        }
+        FileChannel writeChannel = new FileOutputStream("mystuff.txt").getChannel();
+        // 创建读写字节缓冲
+        ByteBuffer writeBuffer = ByteBuffer.allocate(1024);
+        ByteBuffer readBuffer = ByteBuffer.allocate(1024);
+        writeBuffer.put("I love you".getBytes());
+        writeBuffer.flip();
+        writeChannel.write(writeBuffer);
+
+        FileChannel readChannel = new FileInputStream("mystuff.txt").getChannel();
+        readBuffer.clear();
+        readChannel.read(readBuffer);
+        readBuffer.flip();
+        StringBuilder stringBuilder = new StringBuilder();
+        while (readBuffer.hasRemaining()){
+            stringBuilder.append((char)readBuffer.get());
+        }
+        System.out.println("文件的内容："+stringBuilder);
+    }
+}
+```
+
+如果我们要读写大文件，则需要使用内存映射，它能够创建和修改那些大到无法读入内存的文件。
+有了内存映射文件，你就可以认为文件已经全部读进了内存，然后把它当成一个非常大的数组来访问了。
+内存映射的读写速度非常快，下面是使用内存映射读写文件的例子：
+
+```java
+public class LargeMappedFiles {
+  static int length = 0x8000000; // 128 MB
+  public static void
+  main(String[] args) throws Exception {
+    try(
+      RandomAccessFile tdat = new RandomAccessFile("test.dat", "rw")
+    ) {
+      MappedByteBuffer out = tdat.getChannel().map(
+        FileChannel.MapMode.READ_WRITE, 0, length);
+      for(int i = 0; i < length; i++)
+        out.put((byte)'x');
+      System.out.println("Finished writing");
+      for(int i = length/2; i < length/2 + 6; i++)
+        System.out.print((char)out.get(i));
+    }
+  }
+}
+```
+输出结果:
+```bash
+Finished writing
+xxxxxx
+```
+注意这里的`MappedByteBuffer`拥有`ByteBuffer`的所有方法。
+
 ### Tomcat 层面的优化
 #### Tomcat性能测试
 使用apache jmeter测试工具进行Tomcat性能测试。

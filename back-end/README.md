@@ -367,3 +367,36 @@ JAVA_OPTS="-XX:+UseG1GC -XX:MaxGCPauseMillis=100 -Xms128m -Xmx1024m -XX:+PrintGC
 
 然后通过jmeter进行性能测试，并且通过`easyGC`来查看程序的GC情况，
 一般需要经过多次参数调优，才能得到理想的结果。
+
+### 数据库优化
+#### 索引建立规范
+1. 出现在SELECT、UPDATE、DELETE语句的WHERE从句中的列
+2. 包含在ORDER BY、GROUP BY、DISTINCT中的字段
+   并不要将符合1和2中的字段的列都建立一个索引， 通常将1、2中的字段建立联合索引效果更好
+3. 多表join的关联列(不建议使用外键约束（foreign key），但一定要在表与表之间的关联键上建立索引,外键可用于保证数据的参照完整性，但建议在业务端实现
+                                                         外键会影响父表和子表的写操作从而降低性能)
+    
+4. 不要在一个字段上建立重复索引，如:
+    ```sql
+        --  重复索引示例：
+        primary key(id)、index(id)、unique index(id)
+    ```
+#### 索引建立顺序
+1. 区分度最高的放在联合索引的最左侧（区分度=列中不同值的数量/列的总行数）
+2. 尽量把字段长度小的列放在联合索引的最左侧（因为字段长度越小，一页能存储的数据量越大，IO性能也就越好）
+3. 使用最频繁的列放到联合索引的左侧（这样可以比较少的建立一些索引）
+#### sql开发规范
+1. 使用编程语言的预编译语句进行数据库操作（Prepared Statements）
+2. 避免使用双%号的查询条件
+3. 使用left join 或 not exists 来优化not in 操作
+4. 禁止使用SELECT * 必须使用SELECT <字段列表> 查询
+5. 禁止使用不含字段列表的INSERT语句
+    ```sql
+    --     not good
+       insert into t values ('a','b','c');
+    -- good
+    insert into t(c1,c2,c3) values ('a','b','c');
+ 
+    ```
+6. 避免使用子查询，可以把子查询优化为join操作
+7. 对应同一列进行or判断时，使用in代替or

@@ -176,26 +176,30 @@ nio文件的创建，内容读写操作例子：
 public class SimpleFile {
     public static void main(String[] args) throws IOException {
         Path path = Paths.get("mystuff.txt");
-        if (!Files.exists(path)){
+        if (!Files.exists(path)) {
             Files.createFile(path);
         }
-        FileChannel writeChannel = new FileOutputStream("mystuff.txt").getChannel();
-        // 创建读写字节缓冲
-        ByteBuffer writeBuffer = ByteBuffer.allocate(1024);
-        ByteBuffer readBuffer = ByteBuffer.allocate(1024);
-        writeBuffer.put("I love you".getBytes());
-        writeBuffer.flip();
-        writeChannel.write(writeBuffer);
+        try (
+                FileChannel writeChannel = new FileOutputStream("mystuff.txt").getChannel();
+                FileChannel readChannel = new FileInputStream("mystuff.txt").getChannel()
+        ) {
+            // 创建读写字节缓冲
+            ByteBuffer writeBuffer = ByteBuffer.allocate(1024);
+            ByteBuffer readBuffer = ByteBuffer.allocate(1024);
+            writeBuffer.put("I love you".getBytes());
+            writeBuffer.flip();
+            writeChannel.write(writeBuffer);
 
-        FileChannel readChannel = new FileInputStream("mystuff.txt").getChannel();
-        readBuffer.clear();
-        readChannel.read(readBuffer);
-        readBuffer.flip();
-        StringBuilder stringBuilder = new StringBuilder();
-        while (readBuffer.hasRemaining()){
-            stringBuilder.append((char)readBuffer.get());
+
+            readBuffer.clear();
+            readChannel.read(readBuffer);
+            readBuffer.flip();
+            StringBuilder stringBuilder = new StringBuilder();
+            while (readBuffer.hasRemaining()) {
+                stringBuilder.append((char) readBuffer.get());
+            }
+            System.out.println("文件的内容：" + stringBuilder);
         }
-        System.out.println("文件的内容："+stringBuilder);
     }
 }
 ```

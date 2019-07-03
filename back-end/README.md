@@ -167,6 +167,78 @@ class Example{
 + 数据量大，如果服务器是多核 CPU 的情况下，Stream 的并行迭代**优势明显**，注意并行计算后终止操作为Collect
 + 并行操作时，需要考虑线程安全的问题
 
+
+#### HashMap的使用
+HashMap在使用上强烈建议设置初始值size，计算公式为`dataSize/LOAD_FACTOR`
+其中dataSize为要存储的值大小，load_factor为hashMap的装载因子，默认为0.75
+
+#### 务必使用nio，不要使用传统的io操作
+IO数据流操作，比如网络数据传输，文件读写等等耗时操作，很容易成为系统
+性能的瓶颈，nio下的文件流操作大大快于传统的io操作。
+
+nio文件的创建，内容读写操作例子：
+```java
+public class SimpleFile {
+    public static void main(String[] args) throws IOException {
+        Path path = Paths.get("mystuff.txt");
+        if (!Files.exists(path)) {
+            Files.createFile(path);
+        }
+        try (
+                FileChannel writeChannel = new FileOutputStream("mystuff.txt").getChannel();
+                FileChannel readChannel = new FileInputStream("mystuff.txt").getChannel()
+        ) {
+            // 创建读写字节缓冲
+            ByteBuffer writeBuffer = ByteBuffer.allocate(1024);
+            ByteBuffer readBuffer = ByteBuffer.allocate(1024);
+            writeBuffer.put("I love you".getBytes());
+            writeBuffer.flip();
+            writeChannel.write(writeBuffer);
+
+
+            readBuffer.clear();
+            readChannel.read(readBuffer);
+            readBuffer.flip();
+            StringBuilder stringBuilder = new StringBuilder();
+            while (readBuffer.hasRemaining()) {
+                stringBuilder.append((char) readBuffer.get());
+            }
+            System.out.println("文件的内容：" + stringBuilder);
+        }
+    }
+}
+```
+
+如果我们要读写大文件，则需要使用内存映射，它能够创建和修改那些大到无法读入内存的文件。
+有了内存映射文件，你就可以认为文件已经全部读进了内存，然后把它当成一个非常大的数组来访问了。
+内存映射的读写速度非常快，下面是使用内存映射读写文件的例子：
+
+```java
+public class LargeMappedFiles {
+  static int length = 0x8000000; // 128 MB
+  public static void
+  main(String[] args) throws Exception {
+    try(
+      RandomAccessFile tdat = new RandomAccessFile("test.dat", "rw")
+    ) {
+      MappedByteBuffer out = tdat.getChannel().map(
+        FileChannel.MapMode.READ_WRITE, 0, length);
+      for(int i = 0; i < length; i++)
+        out.put((byte)'x');
+      System.out.println("Finished writing");
+      for(int i = length/2; i < length/2 + 6; i++)
+        System.out.print((char)out.get(i));
+    }
+  }
+}
+```
+输出结果:
+```bash
+Finished writing
+xxxxxx
+```
+注意这里的`MappedByteBuffer`拥有`ByteBuffer`的所有方法。
+
 ### Tomcat 层面的优化
 #### Tomcat性能测试
 使用apache jmeter测试工具进行Tomcat性能测试。
@@ -310,3 +382,39 @@ JAVA_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseZGC -Xmx2048m -Xlog:gc"
 
 然后通过jmeter进行性能测试，并且通过`easyGC`来查看程序的GC情况，
 一般需要经过多次参数调优，才能得到理想的结果。
+
+### 数据库优化
+#### 索引建立规范
+1. 出现在SELECT、UPDATE、DELETE语句的WHERE从句中的列
+2. 包含在ORDER BY、GROUP BY、DISTINCT中的字段
+   并不要将符合1和2中的字段的列都建立一个索引， 通常将1、2中的字段建立联合索引效果更好, 联合索引遵循最左匹配原则(B+树)。
+3. 多表join的关联列(不建议使用外键约束（foreign key），但一定要在表与表之间的关联键上建立索引,外键可用于保证数据的参照完整性，但建议在业务端实现
+                                                         外键会影响父表和子表的写操作从而降低性能)
+    
+4. 不要在一个字段上建立重复索引，如:
+    ```sql
+        --  重复索引示例：
+        primary key(id)、index(id)、unique index(id)
+    ```
+#### 索引建立顺序
+1. 区分度最高的放在联合索引的最左侧（区分度=列中不同值的数量/列的总行数）
+2. 尽量把字段长度小的列放在联合索引的最左侧（因为字段长度越小，一页能存储的数据量越大，IO性能也就越好）
+3. 使用最频繁的列放到联合索引的左侧（这样可以比较少的建立一些索引）
+4. 索引列不能有**null**，这点切记
+#### sql开发规范
+1. 使用编程语言的预编译语句进行数据库操作（Prepared Statements）
+2. 避免使用双%号的查询条件
+3. 使用left join 或 not exists 来优化not in 操作
+4. 禁止使用SELECT * 必须使用SELECT <字段列表> 查询
+5. 禁止使用不含字段列表的INSERT语句
+    ```sql
+    --     not good
+    insert into t values ('a','b','c');
+    -- good
+    insert into t(c1,c2,c3) values ('a','b','c');
+ 
+    ```
+6. 避免使用子查询，可以把子查询优化为join操作
+7. 对应同一列进行or判断时，使用in代替or
+9. 用UNION-ALL 替换 UNION 
+8. 拆分复杂的大SQL为多个小SQL

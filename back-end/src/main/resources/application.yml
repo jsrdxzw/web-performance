@@ -29,7 +29,7 @@ spring:
     username: xzw
     password: xzw
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/demo
+    url: jdbc:mysql://localhost:3306/demo?useSSL=false
     type: com.zaxxer.hikari.HikariDataSource
 
 #mybatis:

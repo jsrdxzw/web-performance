@@ -16,11 +16,11 @@
     <description>Demo project for Spring Boot</description>
 
     <properties>
-        <java.version>1.8</java.version>
         <mysql.version>8.0.15</mysql.version>
         <joda-money.version>1.0.1</joda-money.version>
         <usertype.core.version>6.0.1.GA</usertype.core.version>
         <mybatis.starter.version>2.0.1</mybatis.starter.version>
+        <java.version>11</java.version>
     </properties>
 
     <dependencies>

@@ -19,6 +19,11 @@
 + Mysql配置优化，充分利用缓存查询，与hikariCP搭配使用性能最好
 + 使用了Mybatis以方便SQL更细粒化的控制
 
+### 升级java
+java11相比较于java8有16%以上的性能突破，
+并且具有更高效的垃圾回收算法`ZGC`,建议升级，
+具体在intelliJ IDEA上的操作可参见于[Jdk8到jdk11 SpringBoot 踩坑指南](https://sargeraswang.com/blog/2018/11/10/jdk8dao-jdk11-springboot-cai-keng-zhi-nan/)
+
 ### 代码层面的优化
 
 #### 使用javap反编译代码，查看java字节码分析
@@ -289,7 +294,17 @@ GC的次数减少，意味着性能的提高，我们可以通过`easyGC`来查�
 # 70 + (70 * 43/100)
 JAVA_OPTS="-XX:+UseG1GC -XX:MaxGCPauseMillis=100 -Xms128m -Xmx1024m -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+PrintHeapAtGC -Xloggc:../logs/gc.log"
 ```
-其中堆内存的分配：
+
+*设置ZGC垃圾回收器*
+
+ZGC是java11 新增的垃圾回收算法，暂停时间不会超过10毫秒，
+在java11中默认的是G1垃圾回收算法，我们可以手动设置ZGC
+
+```bash
+JAVA_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseZGC -Xmx2048m -Xlog:gc"
+```
+
+总结上面堆内存的分配：
 1. 具体根据每个应用的情况来，比如日均请求量、fullgc之后内存的大小均值等(+43%)
 2. 建议最大不超过操作系统内存的3/4
 

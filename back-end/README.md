@@ -418,3 +418,26 @@ JAVA_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseZGC -Xmx2048m -Xlog:gc"
 7. 对应同一列进行or判断时，使用in代替or
 9. 用UNION-ALL 替换 UNION 
 8. 拆分复杂的大SQL为多个小SQL
+
+### 设计优化
+
+#### 单例模式
+如果一个系统中，需要对一个类反复创建，则会影响性能。我们可以使用单例模式
+来优化性能和系统设计，单例模式有饿汉单例和懒汉单例，这里我们直接给出线程安全并且
+的延迟加载的单例代码：
+```java
+public class StaticSingleton {
+    private StaticSingleton(){
+        System.out.println("StaticSingleton is created");
+    }
+    private static class SingletonHolder{
+        private static final StaticSingleton INSTANCE = new StaticSingleton();
+    }
+    
+    public StaticSingleton getInstance() {
+        return SingletonHolder.INSTANCE;
+    }
+}
+```
+
+在上面的例子中，使用了匿名静态内部类，即能保证线程安全，又能做到延迟加载。

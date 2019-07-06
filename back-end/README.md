@@ -434,7 +434,7 @@ public class StaticSingleton {
         private static final StaticSingleton INSTANCE = new StaticSingleton();
     }
     
-    public StaticSingleton getInstance() {
+    public static StaticSingleton getInstance() {
         return SingletonHolder.INSTANCE;
     }
 }
@@ -453,11 +453,25 @@ public class StaticSingleton implements Serializable{
         private static final StaticSingleton INSTANCE = new StaticSingleton();
     }
     
-    public StaticSingleton getInstance() {
+    public static StaticSingleton getInstance() {
         return SingletonHolder.INSTANCE;
     }
     private Object readResolve(){
         return getInstance();
     }
+    
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
+            // 测试序列化单例
+            StaticSingleton instance = StaticSingleton.getInstance();
+            FileOutputStream fos = new FileOutputStream("singleton.txt");
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fos);
+            objectOutputStream.writeObject(instance);
+            objectOutputStream.flush();
+            objectOutputStream.close();
+            FileInputStream fileInputStream = new FileInputStream("singleton.txt");
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            StaticSingleton read = (StaticSingleton) objectInputStream.readObject();
+            System.out.println(read==instance);
+        }
 }
 ```

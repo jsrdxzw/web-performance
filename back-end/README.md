@@ -224,6 +224,7 @@ public class LargeMappedFiles {
       MappedByteBuffer out = tdat.getChannel().map(
         FileChannel.MapMode.READ_WRITE, 0, length);
       for(int i = 0; i < length; i++)
+          // 开始写入文件
         out.put((byte)'x');
       System.out.println("Finished writing");
       for(int i = length/2; i < length/2 + 6; i++)
@@ -238,6 +239,11 @@ Finished writing
 xxxxxx
 ```
 注意这里的`MappedByteBuffer`拥有`ByteBuffer`的所有方法。
+
+最后一个概念是直接缓冲区，它是以创建和销毁时的开销换取了IO操作的高效率。
+另外一点是，直接缓冲区使用的内存是直接调用了操作系统api分配的，绕过了JVM堆栈。 
+直接缓冲区通过ByteBuffer.allocateDirect()方法创建，并可以调用isDirect()来查询一个缓冲区是否为直接缓冲区。 
+一般来说，直接缓冲区是性能最高的IO选择。
 
 ### Tomcat 层面的优化
 #### Tomcat性能测试

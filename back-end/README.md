@@ -172,6 +172,35 @@ class Example{
 HashMap在使用上强烈建议设置初始值size，计算公式为`dataSize/LOAD_FACTOR`
 其中dataSize为要存储的值大小，load_factor为hashMap的装载因子，默认为0.75
 
+#### 合理使用try-catch
+try-catch在java程序中对性能是有影响的，特别是在循环语句中：
+
+```java
+// bad code
+int a = 0;
+for(int i=0;i<100000000;i++){
+    try {
+        a++;
+    } catch (Exception e){}
+}
+
+// good code
+int a = 0;
+try {
+    for(int i=0;i<100000000;i++){
+        a++;
+    }
+} catch (Exception e){}
+```
+后面的代码比前面的代码性能至少提升两倍
+
+#### 工具类务必使用static静态方法实现
+静态方法的调用速度快于实例方法
+
+#### 使用`arrayCopy`进行数组复制
+在数据复制的时候，我们可以通过`arrayCopy`对原数组进行复制，
+这样能极大提高复制性能。
+
 #### 务必使用nio，不要使用传统的io操作
 IO数据流操作，比如网络数据传输，文件读写等等耗时操作，很容易成为系统
 性能的瓶颈，nio下的文件流操作大大快于传统的io操作。

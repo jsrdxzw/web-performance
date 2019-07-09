@@ -510,3 +510,38 @@ public class StaticSingleton implements Serializable{
         }
 }
 ```
+
+#### 享元模式
+享元模式也是一个很常见的模式，核心思想当需要维护不同的实例时，
+比如公司实例，用一个Map结构来存储实例，这样就不需要重复创建了。
+
+最重要的就是工厂类，代码如下:
+```java
+public class FlyWeightFactory {
+    private Map<String, FinancialManager> financialManagerMap;
+    private Map<String, EngineerManager> engineerManagerMap;
+
+    public FlyWeightFactory() {
+        financialManagerMap = new HashMap<>();
+        engineerManagerMap = new HashMap<>();
+    }
+
+    IReportManager getFinancialManager(String id) {
+        FinancialManager financialManager = financialManagerMap.get(id);
+        if (financialManager == null) {
+            financialManager = new FinancialManager();
+            financialManagerMap.put(id, financialManager);
+        }
+        return financialManager;
+    }
+
+    IReportManager getEngineerManager(String id) {
+        EngineerManager engineerManager = engineerManagerMap.get(id);
+        if (engineerManager == null) {
+            engineerManager = new EngineerManager();
+            engineerManagerMap.put(id, engineerManager);
+        }
+        return engineerManager;
+    }
+}
+```

@@ -545,3 +545,43 @@ public class FlyWeightFactory {
     }
 }
 ```
+
+#### 装饰器模式
+
+我们常常需要将功能组件和性能组件做拆分，比如给你一个字符串，如何根据不同的业务场景，
+对字符串做内容的增添呢，最合适的就是装饰器模式了。
+
+装饰器模式体现了组合优于继承的设计思想，我们知道如果两个类不满足`is a`关系，
+而使用继承是不合理的，特别是后期维护，会产生比如重载方法，父类调用子类重载方法，
+带来的莫名奇妙的问题。使用组合能有效解决问题，并且能做进一步的方法增强。
+
+UML类图:
+![decorator](assets/decorator.png)
++ 装饰器类和被装饰类需要实现共同的接口。
++ 装饰器模式需要实现一个抽象装饰父类，因为我们后期会添加不同功能的子类。
+
+代码如下：
+```java
+public abstract class PacketContentDecorator implements IPacketContent {
+    // 被装饰对象
+    protected IPacketContent packetContent;
+    public PacketContentDecorator(IPacketContent packetContent) {
+        this.packetContent = packetContent;
+    }
+}
+```
+```java
+public class HtmlPacketContentDecorator extends PacketContentDecorator {
+
+    public HtmlPacketContentDecorator(IPacketContent packetContent) {
+        super(packetContent);
+    }
+
+    @Override
+    public String handleContent() {
+        return "<html>" + packetContent + "</html>";
+    }
+}
+```
+我们使用装饰器模式，也可以改变原有对象的处理方式而提高性能。
+比如可以先增加缓存，然后达到一定条件再调用被装饰类的方法，而不是每次都调用。

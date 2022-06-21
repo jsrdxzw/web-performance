@@ -16,7 +16,7 @@
     <description>Demo project for Spring Boot</description>
 
     <properties>
-        <mysql.version>8.0.16</mysql.version>
+        <mysql.version>8.0.28</mysql.version>
         <joda-money.version>1.0.1</joda-money.version>
         <usertype.core.version>6.0.1.GA</usertype.core.version>
         <mybatis.starter.version>2.0.1</mybatis.starter.version>
